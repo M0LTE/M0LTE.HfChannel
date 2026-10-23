@@ -1,0 +1,32 @@
+namespace M0LTE.HfChannel
+{
+    public static class ImpulseNoise
+    {
+        public static void Add(float[] output, int sampleRate, double noiseSigma, M0LTE.HfChannel.ImpulseNoiseProfile profile, System.Random random) { }
+    }
+    public sealed class ImpulseNoiseProfile : System.IEquatable<M0LTE.HfChannel.ImpulseNoiseProfile>
+    {
+        public ImpulseNoiseProfile(double RatePerMinute) { }
+        public double RatePerMinute { get; init; }
+        public static M0LTE.HfChannel.ImpulseNoiseProfile Evening { get; }
+        public static M0LTE.HfChannel.ImpulseNoiseProfile SunrisePeak { get; }
+    }
+    public sealed class WattersonChannel
+    {
+        public const int GainSampleRateHz = 96;
+        public WattersonChannel(int sampleRate, int seed, params M0LTE.HfChannel.WattersonPath[] paths) { }
+        public double CentreHz { get; init; }
+        public System.Collections.Generic.IReadOnlyList<M0LTE.Ofdm.Cf[]>? LastPathGains { get; }
+        public bool RecordGains { get; set; }
+        public static M0LTE.HfChannel.WattersonPath[] Poor { get; }
+        public float[] Apply(System.ReadOnlySpan<float> input, double snrDb, double noiseBandwidthHz = 3000, int leadInSamples = 0, int leadOutSamples = 0, double frequencyOffsetHz = 0, M0LTE.HfChannel.ImpulseNoiseProfile? impulses = null) { }
+    }
+    public sealed class WattersonPath : System.IEquatable<M0LTE.HfChannel.WattersonPath>
+    {
+        public WattersonPath(double DelayMs, bool Fading = false, double DopplerSpreadHz = 1, double DopplerShiftHz = 0) { }
+        public double DelayMs { get; init; }
+        public double DopplerShiftHz { get; init; }
+        public double DopplerSpreadHz { get; init; }
+        public bool Fading { get; init; }
+    }
+}

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>M0LTE.HfChannel</PackageId>
+    <Title>M0LTE.HfChannel</Title>
+    <Description>An HF channel simulator for measuring modems: the Watterson tapped-delay-line model of MIL-STD-188-110D Appendix E (Rayleigh-fading or static paths with a Gaussian Doppler spectrum, AWGN calibrated as SNR in a 3 kHz bandwidth, the ITU-R F.1487 Poor geometry) and impulse noise (static crashes) calibrated from a measured 40 m capture campaign. Extracted from the pdn-soundmodem packet-radio modem so every HF modem measured through it shares one definition.</Description>
+    <PackageTags>hf;channel-simulator;watterson;fading;awgn;impulse-noise;modem;amateur-radio;ham-radio</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="M0LTE.Ofdm" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="M0LTE.HfChannel.Tests" />
+  </ItemGroup>
+
+</Project>
