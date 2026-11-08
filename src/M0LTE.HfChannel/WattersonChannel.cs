@@ -70,6 +70,15 @@ public sealed class WattersonChannel
         new WattersonPath(2, Fading: true, DopplerSpreadHz: 1),
     ];
 
+    /// <summary>The ITU-R F.1487 "Moderate" channel (Mid-Latitude Moderate, Annex 3 section
+    /// 3.2; the former F.520 moderate channel): 2 equal-power Rayleigh paths, 1 ms, 0.5 Hz
+    /// two-sigma spread. Not the Low-Latitude Moderate (2 ms, 1.5 Hz) of section 2.2.</summary>
+    public static WattersonPath[] Moderate =>
+    [
+        new WattersonPath(0, Fading: true, DopplerSpreadHz: 0.5),
+        new WattersonPath(1, Fading: true, DopplerSpreadHz: 0.5),
+    ];
+
     /// <summary>Applies the channel and noise. <paramref name="snrDb"/> is signal-to-noise
     /// with the noise measured in <paramref name="noiseBandwidthHz"/> (3 kHz per D.6.2);
     /// pass <see cref="double.PositiveInfinity"/> for a noiseless run.
