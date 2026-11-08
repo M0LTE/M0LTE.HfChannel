@@ -1,5 +1,18 @@
 namespace M0LTE.HfChannel
 {
+    public sealed class ContinuousWattersonChannel
+    {
+        public ContinuousWattersonChannel(int sampleRate, int seed, double snrDb, double signalPower, params M0LTE.HfChannel.WattersonPath[] paths) { }
+        public double CentreHz { get; init; }
+        public double FrequencyOffsetHz { get; init; }
+        public int LatencySamples { get; }
+        public double NoiseBandwidthHz { get; init; }
+        public M0LTE.HfChannel.SsbPassband? ReceivePassband { get; init; }
+        public long SamplesProcessed { get; }
+        public M0LTE.HfChannel.SsbPassband? TransmitPassband { get; init; }
+        public float[] Process(System.ReadOnlySpan<float> input) { }
+        public void Process(System.ReadOnlySpan<float> input, System.Span<float> output) { }
+    }
     public static class ImpulseNoise
     {
         public static void Add(float[] output, int sampleRate, double noiseSigma, M0LTE.HfChannel.ImpulseNoiseProfile profile, System.Random random) { }
@@ -11,6 +24,24 @@ namespace M0LTE.HfChannel
         public static M0LTE.HfChannel.ImpulseNoiseProfile Evening { get; }
         public static M0LTE.HfChannel.ImpulseNoiseProfile SunrisePeak { get; }
     }
+    public sealed class SsbFilter
+    {
+        public const double TransitionHz = 300D;
+        public SsbFilter(int sampleRate, M0LTE.HfChannel.SsbPassband passband) { }
+        public int LatencySamples { get; }
+        public M0LTE.HfChannel.SsbPassband Passband { get; }
+        public int SampleRate { get; }
+        public float[] Apply(System.ReadOnlySpan<float> input) { }
+        public float[] Process(System.ReadOnlySpan<float> input) { }
+        public void Process(System.ReadOnlySpan<float> input, System.Span<float> output) { }
+        public double ResponseDb(double frequencyHz) { }
+    }
+    public sealed class SsbPassband : System.IEquatable<M0LTE.HfChannel.SsbPassband>
+    {
+        public SsbPassband(double LowHz = 400, double HighHz = 2600) { }
+        public double HighHz { get; init; }
+        public double LowHz { get; init; }
+    }
     public sealed class WattersonChannel
     {
         public const int GainSampleRateHz = 96;
@@ -18,6 +49,7 @@ namespace M0LTE.HfChannel
         public double CentreHz { get; init; }
         public System.Collections.Generic.IReadOnlyList<M0LTE.Ofdm.Cf[]>? LastPathGains { get; }
         public bool RecordGains { get; set; }
+        public static M0LTE.HfChannel.WattersonPath[] Moderate { get; }
         public static M0LTE.HfChannel.WattersonPath[] Poor { get; }
         public float[] Apply(System.ReadOnlySpan<float> input, double snrDb, double noiseBandwidthHz = 3000, int leadInSamples = 0, int leadOutSamples = 0, double frequencyOffsetHz = 0, M0LTE.HfChannel.ImpulseNoiseProfile? impulses = null) { }
     }
