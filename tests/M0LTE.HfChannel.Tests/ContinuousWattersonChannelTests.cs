@@ -53,6 +53,59 @@ public class ContinuousWattersonChannelTests
         }
     }
 
+    [Theory]
+    [InlineData(0.0, 0.0)]
+    [InlineData(1.5, 0.0)]
+    [InlineData(2.0, 0.7)]
+    public void Signal_Path_Is_The_Batch_Channel_Delayed_By_The_Latency(double delayMs, double offsetHz)
+    {
+        // A static path (fractional delay where 1.5 or 2 ms is not a whole sample) and an
+        // optional carrier offset, noiseless. The static phase is a random draw, different in
+        // each channel, so two batch runs with different seeds span the plane of possible
+        // phases; the streamed output, moved back by the latency, must lie in that plane.
+        int n = Rate * 2;
+        var random = new Random(77);
+        var input = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            input[i] = (float)(((random.NextDouble() - 0.5) * Math.Sin(2 * Math.PI * 1800 * i / Rate))
+                + (0.3 * Math.Sin(2 * Math.PI * 1100 * i / Rate)));
+        }
+
+        var path = new WattersonPath(delayMs);
+        float[] y1 = new WattersonChannel(Rate, 1, path).Apply(input, double.PositiveInfinity, frequencyOffsetHz: offsetHz);
+        float[] y2 = new WattersonChannel(Rate, 2, path).Apply(input, double.PositiveInfinity, frequencyOffsetHz: offsetHz);
+        var channel = new ContinuousWattersonChannel(Rate, 3, double.PositiveInfinity, 0, path) { FrequencyOffsetHz = offsetHz };
+        int latency = channel.LatencySamples;
+        float[] streamed = channel.Process([.. input, .. new float[latency]]);
+
+        // Least-squares fit streamed = c1 y1 + c2 y2 away from the batch run's edges.
+        int from = 300, to = n - 300;
+        double s11 = 0, s12 = 0, s22 = 0, r1 = 0, r2 = 0, rr = 0;
+        for (int i = from; i < to; i++)
+        {
+            double u = y1[i], v = y2[i], w = streamed[i + latency];
+            s11 += u * u;
+            s12 += u * v;
+            s22 += v * v;
+            r1 += u * w;
+            r2 += v * w;
+            rr += w * w;
+        }
+
+        double det = (s11 * s22) - (s12 * s12);
+        double c1 = ((r1 * s22) - (r2 * s12)) / det;
+        double c2 = ((r2 * s11) - (r1 * s12)) / det;
+        double residual = 0;
+        for (int i = from; i < to; i++)
+        {
+            double e = streamed[i + latency] - (c1 * y1[i]) - (c2 * y2[i]);
+            residual += e * e;
+        }
+
+        (10 * Math.Log10(residual / rr)).Should().BeLessThan(-80);
+    }
+
     [Fact]
     public void Output_Does_Not_Depend_On_How_The_Input_Is_Split_Into_Calls()
     {

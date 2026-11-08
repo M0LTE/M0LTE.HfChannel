@@ -29,8 +29,8 @@ namespace M0LTE.HfChannel;
 /// </list>
 /// <para>
 /// Signal path: transmit passband (optional), channel, noise, receive passband (optional).
-/// The noise is added at the receiver's input, so the receive passband shapes it as it
-/// shapes the signal, and the SNR is the set SNR at the antenna. With no paths and no
+/// The noise is added at the receiver's input (the antenna), so the receive passband shapes
+/// it as it shapes the signal; its level is set from <c>signalPower</c> as above. With no paths and no
 /// frequency offset the channel is the ideal direct path (passband passthrough plus noise),
 /// as in <see cref="WattersonChannel.Apply"/>.
 /// </para>
